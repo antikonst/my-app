@@ -13,13 +13,19 @@
     "bootstrap": "^5.2.0-beta1",
     "excel": "^1.0.1",
     "exceljs": "^4.3.0",
+    "file-saver": "^2.0.5",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-export-excel": "^0.5.3",
     "react-hook-form": "^7.33.1",
     "react-scripts": "5.0.1",
+    "sheetjs-style": "^0.15.8",
+    "sheetjs-style-v2": "^0.15.6",
     "typescript": "^4.7.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.18.9/xlsx-0.18.9.tgz",
+    "xlsx-js-style": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
