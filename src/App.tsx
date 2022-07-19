@@ -1,24 +1,36 @@
 import React, { useState, useCallback } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, useWatch } from "react-hook-form";
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import ExcelJS from 'exceljs';
 //import * as Exceljs from 'exceljs'
 import * as XLSX from "xlsx";
 //import * as FileSaver from 'file-saver';
 import moment from 'moment'
+import { al } from "./amigologo";
+import { SelectRulon } from "./selectrulon";
 var FileSaver = require('file-saver');
 
 type Inputs = {
   width: number,
-  height: number
+  height: number,
+  material: string,
+  color: string
 };
 
 export default function App() {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
+  const { register, getValues, watch, formState: { errors } } = useForm();
   //const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
+  let text = ''
+  const mat = document.getElementById('mat') as HTMLSelectElement
+  if (mat) {
+    text = mat.options[mat.selectedIndex].text
+  }
 
   let w = watch("width")
   let h = watch("height")
+  let m = getValues("material")
+  console.log(text) 
+
 
   let b: string | ArrayBuffer | null = ''
 
@@ -27,28 +39,14 @@ export default function App() {
     let fil = files![0]
     console.log(fil);
     let reader = new FileReader();
-    reader.readAsArrayBuffer(fil); //buffer
+    reader.readAsArrayBuffer(fil);
     reader.onload = async function () {
       b = reader.result
-      //console.log(b);
-
       const wb = XLSX.read(b, { cellStyles: true });
       let ws = wb.Sheets['UNI']
-
       XLSX.utils.sheet_add_aoa(ws, [[w],], { origin: "D8" })
       XLSX.utils.sheet_add_aoa(ws, [[h],], { origin: "E8" })
-
-      /* let row = [
-        { v: "Courier: 24", t: "s", s: { font: { name: "Courier", sz: 24 } } },
-        { v: "bold & color", t: "s", s: { font: { bold: true, color: { rgb: "FF0000" } } } },
-        { v: "fill: color", t: "s", s: { fill: { fgColor: { rgb: "E9E9E9" } } } },
-        { v: "line\nbreak", t: "s", s: { alignment: { wrapText: true } } },
-      ];
-      const wws = XLSX.utils.aoa_to_sheet([row]);
-      XLSX.utils.book_append_sheet(wb, wws, "readme demo"); */
-
-      XLSX.writeFile(wb, "new.xlsx", { cellStyles: true });
-
+      XLSX.writeFile(wb, "new.xlsx", { cellStyles: true })
     };
     reader.onerror = function () {
       console.log(reader.error);
@@ -90,10 +88,8 @@ export default function App() {
     const widthCol = [23, 32, 27, 12, 12, 12, 12, 12, 12, 12, 12, 12]
 
     wsh.getRow(5).height = 155
-    wsh.getRow(5).font = {
-      name: 'Times New Roman',
-      size: 11
-    };
+    wsh.getRow(5).font = { name: 'Times New Roman', size: 11 };
+    wsh.getRow(4).font = { name: 'Times New Roman', size: 11 };
     wsh.mergeCells('D4:E4');
     wsh.mergeCells('J4:K4');
     wsh.mergeCells('A4:A5');
@@ -179,18 +175,28 @@ export default function App() {
     wsh.getCell('A1').font = { name: 'Times New Roman', size: 14, bold: true }
     wsh.mergeCells('A1:L1')
 
-    wsh.spliceRows(6, 0, ['УНИ', , , Math.ceil(w / 10) / 100, Math.ceil(h / 10) / 100, 1, 'прав', 'ст', 'бел', 'да'])
+    wsh.spliceRows(6, 0, ['УНИ', text, , Math.ceil(w / 10) / 100, Math.ceil(h / 10) / 100, 1, 'прав', 'ст', 'бел', 'да'])
     wsh.getRow(6).alignment = { vertical: 'middle', horizontal: 'center' }
     wsh.getRow(6).font = { name: 'Times New Roman', size: 14 }
-    for (let i = 0; i<12; i++) {
+    for (let i = 0; i < 12; i++) {
       let col = massA[i]
       let c = col + 6
       wsh.getCell(c).border = { left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     }
     wsh.getRow(6).height = 58
-    
+    wsh.getRow(7).height = 43
+
+    wsh.getCell('D6').numFmt = '0.00'
+    wsh.getCell('E6').numFmt = '0.00'
+
     wsh.getCell('A7').value = '   Подпись___________                             Печать__________                                 Оплату гарантируем_____________                    С техническими особенностями ознакомлены___________'
- 
+
+    const myBase64Image = "data:image/png;base64," + al
+    const imageId2 = workbook.addImage({
+      base64: myBase64Image,
+      extension: 'png',
+    })
+    wsh.addImage(imageId2, 'J8:K11');
 
     const buffer = await workbook.xlsx.writeBuffer();
     FileSaver.saveAs(new Blob([buffer]), `Заявка_УНИ_${dt}.xlsx`)
@@ -210,6 +216,19 @@ export default function App() {
           <input className="form-control" {...register("height", { required: true })} />
         </div>
         {errors.height && <span>введите высоту</span>}
+
+        <div className="container-fluid w-75 form-floating  form-control-sm">
+          {/* <input className="form-control" {...register("material", { required: true })} /> */}
+          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")}>
+            {SelectRulon}
+          </select>
+        </div>
+        {errors.material && <span>материал</span>}
+
+        <div className="container-fluid w-75 form-floating  form-control-sm">
+          <input className="form-control" {...register("color", { required: true })} />
+        </div>
+        {errors.color && <span>цвет</span>}
 
         {/* <div className="d-flex justify-content-center mt-2">
           <input type="file" onChange={showFile}></input>
