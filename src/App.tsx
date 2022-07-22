@@ -8,6 +8,7 @@ import * as XLSX from "xlsx";
 import moment from 'moment'
 import { al } from "./amigologo";
 import { SelectRulon } from "./selectrulon";
+import { vseRulonColor } from "./vseRulonColor";
 var FileSaver = require('file-saver');
 
 type Inputs = {
@@ -25,6 +26,12 @@ export default function App() {
   if (mat) {
     text = mat.options[mat.selectedIndex].text
   }
+
+let color: any = {vseRulonColor}
+for(let i=0; i<color.length; i++) {
+  if (text == color[i][0]) { console.log(color[i][0]) }
+
+}
 
   let w = watch("width")
   let h = watch("height")
@@ -209,11 +216,13 @@ export default function App() {
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
           <input className="form-control" {...register("width", { required: true })} />
+          <label>ширина, мм</label>
         </div>
         {errors.width && <span>введите ширину</span>}
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
           <input className="form-control" {...register("height", { required: true })} />
+          <label>высота, мм</label>
         </div>
         {errors.height && <span>введите высоту</span>}
 
@@ -222,11 +231,13 @@ export default function App() {
           <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")}>
             {SelectRulon}
           </select>
+          <label>материал</label>
         </div>
         {errors.material && <span>материал</span>}
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
           <input className="form-control" {...register("color", { required: true })} />
+          <label>цвет</label>
         </div>
         {errors.color && <span>цвет</span>}
 
