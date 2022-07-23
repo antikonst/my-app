@@ -1,14 +1,13 @@
-import React, { useState, useCallback } from "react";
-import { useForm, SubmitHandler, useWatch } from "react-hook-form";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import ExcelJS from 'exceljs';
-//import * as Exceljs from 'exceljs'
 import * as XLSX from "xlsx";
-//import * as FileSaver from 'file-saver';
 import moment from 'moment'
 import { al } from "./amigologo";
 import { SelectRulon } from "./selectrulon";
 import { vseRulonColor } from "./vseRulonColor";
+import parse from 'html-react-parser';
 var FileSaver = require('file-saver');
 
 type Inputs = {
@@ -21,24 +20,43 @@ type Inputs = {
 export default function App() {
   const { register, getValues, watch, formState: { errors } } = useForm();
   //const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
-  let text = ''
+  let text = 'АВЕНСИС'
   const mat = document.getElementById('mat') as HTMLSelectElement
   if (mat) {
     text = mat.options[mat.selectedIndex].text
   }
 
-let color: any = {vseRulonColor}
-for(let i=0; i<color.length; i++) {
-  if (text == color[i][0]) { console.log(color[i][0]) }
+  let colorRulon = ''
+  for (let i = 0; i < vseRulonColor.length; i++) {
+    vseRulonColor[i][0] = vseRulonColor[i][0].toUpperCase().replaceAll('BO', 'BLACK-OUT').replaceAll('_', '')
+  }
+  //let kn = Date.now()
+  let col = document.getElementById('col') as HTMLSelectElement
 
-}
+const [cl, setCl] = useState(parse('<option>300715-0225 белый</option><option>300715-1908 черный</option>'))
 
+let clo = cl
+  if (col) {
+    clo = col.options[col.selectedIndex].text
+  }
+
+const onchan = () => {
+  colorRulon = ''
+    vseRulonColor.forEach((i) => {
+      if (i[0] == text) {
+        let c = i[1] + ' ' + i[2]
+        colorRulon += '<option>' + c + '</option>'
+      }
+    })
+    setCl(parse(colorRulon))
+  }
+ 
   let w = watch("width")
   let h = watch("height")
-  let m = getValues("material")
-  console.log(text) 
+  //let m = getValues("material")
+  //let c = getValues("color")
 
-
+  // тоже работает, но не форматирует
   let b: string | ArrayBuffer | null = ''
 
   const showFile = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -182,7 +200,7 @@ for(let i=0; i<color.length; i++) {
     wsh.getCell('A1').font = { name: 'Times New Roman', size: 14, bold: true }
     wsh.mergeCells('A1:L1')
 
-    wsh.spliceRows(6, 0, ['УНИ', text, , Math.ceil(w / 10) / 100, Math.ceil(h / 10) / 100, 1, 'прав', 'ст', 'бел', 'да'])
+    wsh.spliceRows(6, 0, ['УНИ', text, clo, Math.ceil(w / 10) / 100, Math.ceil(h / 10) / 100, 1, 'прав', 'ст', 'бел', 'да'])
     wsh.getRow(6).alignment = { vertical: 'middle', horizontal: 'center' }
     wsh.getRow(6).font = { name: 'Times New Roman', size: 14 }
     for (let i = 0; i < 12; i++) {
@@ -210,7 +228,11 @@ for(let i=0; i<color.length; i++) {
   }
 
 
+  //changeRulon()
+
   return (
+
+
     <>
       <form className="row" noValidate>
 
@@ -227,20 +249,22 @@ for(let i=0; i<color.length; i++) {
         {errors.height && <span>введите высоту</span>}
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
-          {/* <input className="form-control" {...register("material", { required: true })} /> */}
-          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")}>
+          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onClick={onchan} onChange={onchan}>
             {SelectRulon}
           </select>
           <label>материал</label>
         </div>
         {errors.material && <span>материал</span>}
 
-        <div className="container-fluid w-75 form-floating  form-control-sm">
-          <input className="form-control" {...register("color", { required: true })} />
+        <div className="container-fluid w-75 form-floating  form-control-sm" id="torender">
+          <select id='col' className="form-select" defaultValue='белый' {...register("color")} >
+            {cl}
+          </select>
           <label>цвет</label>
         </div>
-        {errors.color && <span>цвет</span>}
 
+        {errors.color && <span>цвет</span>}
+ 
         {/* <div className="d-flex justify-content-center mt-2">
           <input type="file" onChange={showFile}></input>
         </div> */}
@@ -249,5 +273,7 @@ for(let i=0; i<color.length; i++) {
         <button className="btn btn-outline-primary mt-3" onClick={go}>go</button>
       </div>
     </>
-  );
+
+  )
+
 }
