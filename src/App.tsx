@@ -236,17 +236,21 @@ const onchan = () => {
     <>
       <form className="row" noValidate>
 
-        <div className="container-fluid w-75 form-floating  form-control-sm">
+<div className="row mx-auto w-75 p-0">
+
+        <div className=" col form-floating  form-control-sm">
           <input className="form-control" {...register("width", { required: true })} />
           <label>ширина, мм</label>
         </div>
         {errors.width && <span>введите ширину</span>}
 
-        <div className="container-fluid w-75 form-floating  form-control-sm">
+        <div className="col form-floating  form-control-sm">
           <input className="form-control" {...register("height", { required: true })} />
           <label>высота, мм</label>
         </div>
         {errors.height && <span>введите высоту</span>}
+</div>
+
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
           <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onClick={onchan} onChange={onchan}>
@@ -269,8 +273,8 @@ const onchan = () => {
           <input type="file" onChange={showFile}></input>
         </div> */}
       </form>
-      <div className="d-flex justify-content-center mt-2">
-        <button className="btn btn-outline-primary mt-3" onClick={go}>go</button>
+      <div className="d-flex justify-content-center">
+        <button className="btn btn-outline-primary mt-1" onClick={go}>go</button>
       </div>
     </>
 
