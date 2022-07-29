@@ -18,6 +18,9 @@ type Inputs = {
 };
 
 export default function App() {
+
+  const clck = new Event("click")
+
   const { register, getValues, watch, formState: { errors }, handleSubmit } = useForm(
     {
       //mode: "onBlur"
@@ -25,16 +28,17 @@ export default function App() {
     }
   );
   //const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
-  let text = 'АВЕНСИС'
+  //let text = 'АВЕНСИС'
+  const [text, setText] = useState('АВЕНСИС')
   const mat = document.getElementById('mat') as HTMLSelectElement
-  if (mat) {
-    text = mat.options[mat.selectedIndex].text
-  }
+
 
   let colorRulon = ''
-  for (let i = 0; i < vseRulonColor.length; i++) {
-    vseRulonColor[i][0] = vseRulonColor[i][0].toUpperCase().replaceAll('BO', 'BLACK-OUT').replaceAll('_', '')
-  }
+  useEffect(() => {
+    for (let i = 0; i < vseRulonColor.length; i++) {
+      vseRulonColor[i][0] = vseRulonColor[i][0].toUpperCase().replaceAll('BO', 'BLACK-OUT').replaceAll('_', '')
+    }
+  })
   //let kn = Date.now()
   const col = document.getElementById('col') as HTMLSelectElement
 
@@ -48,16 +52,99 @@ export default function App() {
     }
   }
 
-  const onchan = () => {
-    colorRulon = ''
-    vseRulonColor.forEach((i) => {
-      if (i[0] == text) {
-        let c = i[1] + ' ' + i[2]
-        colorRulon += '<option>' + c + '</option>'
-      }
-    })
-    setCl(parse(colorRulon))
+  const onText = () => {
+    if (mat) {
+      setText(mat.options[mat.selectedIndex].text)
+    }
   }
+
+  const onchan = async () => {
+    if (mat) {
+      setText(mat.options[mat.selectedIndex].text)
+    }
+    colorRulon = ''
+
+    let promise = new Promise((resolve, reject) => {
+      vseRulonColor.forEach((i) => {
+        if (i[0] == text) {
+          let c = i[1] + ' ' + i[2]
+          colorRulon += '<option>' + c + '</option>'
+          //resolve(colorRulon += '<option>' + c + '</option>')
+        }
+      })
+
+      resolve(setCl(parse(colorRulon)))
+    })
+    //.then(value => value)
+    await promise
+    //setCl(parse(colorRulon))
+    //setClo(col.options[col.selectedIndex].text)
+    //console.log(col.childNodes[0].textContent)
+    //onClo()
+    //ust()
+    filter()
+  }
+
+  const onchangeFilter = async () => {
+    /* onText()
+    colorRulon = ''
+    ustanovit_spisok_color()
+    setCl(parse(colorRulon)) */
+
+
+    //let ust_color = (n[0][1] + ' ' + n[0][2])
+    //setClo(ust_color)
+
+    /* const click = () => {
+      if (mat)mat.dispatchEvent(clck)
+      console.log(clo)
+    }
+    
+        setTimeout(click, 100) */
+    
+
+    new Promise(resolve => resolve(onText()))
+    .then(() => colorRulon = '')
+    .then(() => ustanovit_spisok_color())
+    .then(() => setCl(parse(colorRulon)))
+    .then(() => setCl(parse(colorRulon)))
+    .then(() => {if (mat)mat.dispatchEvent(clck)})
+    .then(() => onClo())
+
+  }
+
+  const ustanovit_spisok_color = () => {
+    const n = vseRulonColor.filter(item => item[0] == text)
+    n.forEach((i) => {
+      const c = (i[1] + ' ' + i[2])
+      colorRulon += '<option>' + c + '</option>'
+    })
+    return colorRulon
+  }
+
+  useEffect(() => {
+    //setCl(parse(colorRulon))
+    //parse(colorRulon)
+    ustanovit_spisok_color()
+  })
+
+  /* const ust = () => {
+    const n = vseRulonColor.find(item => item[0] == text)
+    if (n) setClo(n[1] + ' ' + n[2])
+    //console.log(n)
+    //console.log(clo)
+  } */
+
+  const filter = () => {
+    const f = vseRulonColor.filter(item => item[0] == text)
+    const f0 = (f[0][1] + ' ' + f[0][2])
+    setClo(f0)
+  }
+
+  /* useEffect(() => {
+    //ust()
+    filter()
+  }) */
 
   const [u, setU] = useState('прав')
   const upr = document.getElementById('upr') as HTMLSelectElement
@@ -268,7 +355,7 @@ export default function App() {
   const xlsxbut = document.getElementById('xlsx')
   const tata = document.getElementById('ta')
 
-  if (lengthSpisok > 0) {
+  if (arrtabl.length > 0) {
     xlsxbut?.classList.remove('d-none')
   } else {
     xlsxbut?.classList.add('d-none')
@@ -324,7 +411,7 @@ export default function App() {
 
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
-          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onClick={onchan} onChange={onchan}>
+          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onClick={onchangeFilter} onChange={onchangeFilter}>
             {SelectRulon}
           </select>
           <label>материал</label>
@@ -363,7 +450,7 @@ export default function App() {
           <input type="file" onChange={showFile}></input>
         </div> */}
         <div className="container-fluid w-100 form-floating  form-control-sm">
-          <textarea className="form-control form-control-sm h-auto py-0 px-2" value={spisok} readOnly rows={lengthSpisok*2}></textarea>
+          <textarea className="form-control form-control-sm h-auto py-0 px-2" value={spisok} readOnly rows={lengthSpisok * 2}></textarea>
         </div>
       </form>
 
