@@ -27,25 +27,25 @@ export default function App() {
       mode: "onChange"
     }
   );
-  //const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
-  //let text = 'АВЕНСИС'
-  const [text, setText] = useState('АВЕНСИС')
+  
   const mat = document.getElementById('mat') as HTMLSelectElement
+  const col = document.getElementById('col') as HTMLSelectElement
+  const upr = document.getElementById('upr') as HTMLSelectElement
+  
+  const [text, setText] = useState('АВЕНСИС')
+  const [colorRulon, setColorRulon] = useState('')
+  const [clo, setClo] = useState('300715-0225 белый')
+  const [u, setU] = useState('прав')
 
-
-  let colorRulon = ''
   useEffect(() => {
     for (let i = 0; i < vseRulonColor.length; i++) {
       vseRulonColor[i][0] = vseRulonColor[i][0].toUpperCase().replaceAll('BO', 'BLACK-OUT').replaceAll('_', '')
     }
+    ustanovit_spisok_color()
+    setSpisok(strokaToStr)
+    onchanupr()
   })
-  //let kn = Date.now()
-  const col = document.getElementById('col') as HTMLSelectElement
-
-  const [cl, setCl] = useState(parse('<option>300715-0225 белый</option><option>300715-1908 черный</option>'))
-
-  const [clo, setClo] = useState('300715-0225 белый')
-  //let clo = cl
+  
   const onClo = () => {
     if (col) {
       setClo(col.options[col.selectedIndex].text)
@@ -58,106 +58,28 @@ export default function App() {
     }
   }
 
-  const onchan = async () => {
-    if (mat) {
-      setText(mat.options[mat.selectedIndex].text)
-    }
-    colorRulon = ''
-
-    let promise = new Promise((resolve, reject) => {
-      vseRulonColor.forEach((i) => {
-        if (i[0] == text) {
-          let c = i[1] + ' ' + i[2]
-          colorRulon += '<option>' + c + '</option>'
-          //resolve(colorRulon += '<option>' + c + '</option>')
-        }
-      })
-
-      resolve(setCl(parse(colorRulon)))
-    })
-    //.then(value => value)
-    await promise
-    //setCl(parse(colorRulon))
-    //setClo(col.options[col.selectedIndex].text)
-    //console.log(col.childNodes[0].textContent)
-    //onClo()
-    //ust()
-    filter()
-  }
-
-  const onchangeFilter = async () => {
-    /* onText()
-    colorRulon = ''
+  const onchangeFilter = () => {
+    onText()
+    setColorRulon('')
     ustanovit_spisok_color()
-    setCl(parse(colorRulon)) */
-
-
-    //let ust_color = (n[0][1] + ' ' + n[0][2])
-    //setClo(ust_color)
-
-    /* const click = () => {
-      if (mat)mat.dispatchEvent(clck)
-      console.log(clo)
-    }
-    
-        setTimeout(click, 100) */
-    
-
-    new Promise(resolve => resolve(onText()))
-    .then(() => colorRulon = '')
-    .then(() => ustanovit_spisok_color())
-    .then(() => setCl(parse(colorRulon)))
-    .then(() => setCl(parse(colorRulon)))
-    .then(() => {if (mat)mat.dispatchEvent(clck)})
-    .then(() => onClo())
-
   }
 
   const ustanovit_spisok_color = () => {
     const n = vseRulonColor.filter(item => item[0] == text)
+    let cr= ''
     n.forEach((i) => {
       const c = (i[1] + ' ' + i[2])
-      colorRulon += '<option>' + c + '</option>'
+      cr += ('<option>' + c + '</option>')
+      setColorRulon(cr)
     })
-    return colorRulon
+    onClo()
   }
 
-  useEffect(() => {
-    //setCl(parse(colorRulon))
-    //parse(colorRulon)
-    ustanovit_spisok_color()
-  })
-
-  /* const ust = () => {
-    const n = vseRulonColor.find(item => item[0] == text)
-    if (n) setClo(n[1] + ' ' + n[2])
-    //console.log(n)
-    //console.log(clo)
-  } */
-
-  const filter = () => {
-    const f = vseRulonColor.filter(item => item[0] == text)
-    const f0 = (f[0][1] + ' ' + f[0][2])
-    setClo(f0)
-  }
-
-  /* useEffect(() => {
-    //ust()
-    filter()
-  }) */
-
-  const [u, setU] = useState('прав')
-  const upr = document.getElementById('upr') as HTMLSelectElement
   const onchanupr = () => {
     if (upr) {
       setU(upr.options[upr.selectedIndex].text)
     }
   }
-  /* useEffect(() => {
-    if (upr) u = upr.options[upr.selectedIndex].text
-    if (col) clo = col.options[col.selectedIndex].text
-    if (mat) text = mat.options[mat.selectedIndex].text
-  }); */
 
   let w: number, h: number, num: number, stroka: any[], tabl: any[], tablstr: string
   w = watch("width")
@@ -168,41 +90,14 @@ export default function App() {
   const [arrtabl, setArrtabl] = useState(tabl)
   const [spisok, setSpisok] = useState('')
 
-  //tablstr = ''
-  //u = getValues("upr")
-  //console.log(w,h,num,u)
-  //let u = getValues("upr")
   stroka = ['УНИ-1', text, clo, Math.ceil(w) / 1000, Math.ceil(h) / 1000, num, u, 'ст', 'бел', 'да']
-
-
-
-
-  // тоже работает, но не форматирует
-  /* let b: string | ArrayBuffer | null = ''
-  const showFile = (e: React.FormEvent<HTMLInputElement>): void => {
-    let files: FileList | null = e.currentTarget.files;
-    let fil = files![0]
-    console.log(fil);
-    let reader = new FileReader();
-    reader.readAsArrayBuffer(fil);
-    reader.onload = async function () {
-      b = reader.result
-      const wb = XLSX.read(b, { cellStyles: true });
-      let ws = wb.Sheets['UNI']
-      XLSX.utils.sheet_add_aoa(ws, [[w],], { origin: "D8" })
-      XLSX.utils.sheet_add_aoa(ws, [[h],], { origin: "E8" })
-      XLSX.writeFile(wb, "new.xlsx", { cellStyles: true })
-    };
-    reader.onerror = function () {
-      console.log(reader.error);
-    };
-  } */
 
   const go = async () => {
     let date = 'Дата ' + moment().format("DD") + '.' + moment().format("MM") + '.' + moment().format("YYYY") + 'г.'
     let dt = moment().format("DD") + moment().format("MM") + moment().format("YY")
     const workbook = new ExcelJS.Workbook();
     const wsh = workbook.addWorksheet('UNI')
+    wsh.getRow(3).height = 35
     wsh.getCell('A3').value = 'Название фирмы "ГерАрт"'
     wsh.getCell('A3').font = {
       name: 'Times New Roman',
@@ -310,9 +205,7 @@ export default function App() {
       top: { style: 'medium' },
       bottom: { style: 'medium' },
     }
-
-    //wsh.spliceRows(1, 0, [])
-    //wsh.spliceRows(1, 0, [])
+ 
     wsh.getCell('A1').value = 'Бланк заказа на кассетные рулонные шторы UNI1, UNI2, UNI1-Зебра, UNI2-Зебра, UNI с пружиной'
     wsh.getCell('A1').alignment = { horizontal: 'right' }
     wsh.getCell('A1').font = { name: 'Times New Roman', size: 14, bold: true }
@@ -350,7 +243,6 @@ export default function App() {
 
   let [lengthSpisok, setLengthSpisok] = useState(1)
 
-  //changeRulon()
   const addbut = document.getElementById('add')
   const xlsxbut = document.getElementById('xlsx')
   const tata = document.getElementById('ta')
@@ -373,24 +265,10 @@ export default function App() {
     setStrokaToStr(strokaToStr + '\n' + stroka.join(', ').replace(/УНИ/g, lengthSpisok + '. УНИ'))
     arrtabl.push(stroka)
     setArrtabl(arrtabl)
-    //console.log(arrtabl)
     setLengthSpisok(arrtabl.length + 1)
-    //let n = lengthSpisok + '. УНИ'
-    //console.log(n)
-    //setSpisok(arrtabl.join('\n').replace(/'УНИ'/g, n))
-    //tata!.innerHTML = spisok
   }
 
-
-
-  useEffect(() => {
-    //setSpisok(arrtabl.join('\n').replace(/УНИ/g, lengthSpisok + '. УНИ'))
-    setSpisok(strokaToStr)
-  })
-
   return (
-
-
     <>
       <form className="row" noValidate>
 
@@ -411,7 +289,7 @@ export default function App() {
 
 
         <div className="container-fluid w-75 form-floating  form-control-sm">
-          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onClick={onchangeFilter} onChange={onchangeFilter}>
+          <select id='mat' className="form-select" defaultValue='АВЕНСИС' {...register("material")} onChange={onchangeFilter}>
             {SelectRulon}
           </select>
           <label>материал</label>
@@ -419,8 +297,8 @@ export default function App() {
         {errors.material && <span>материал</span>}
 
         <div className="container-fluid w-75 form-floating  form-control-sm" id="torender">
-          <select id='col' className="form-select" defaultValue='белый' {...register("color")} onClick={onClo} onChange={onClo}>
-            {cl}
+          <select id='col' className="form-select" defaultValue='белый' {...register("color")} onChange={onClo}>
+            {parse(colorRulon)}
           </select>
           <label>цвет</label>
         </div>
@@ -435,7 +313,7 @@ export default function App() {
           {errors.num && <span>введите количество</span>}
 
           <div className="col form-floating  form-control-sm">
-            <select id='upr' className="form-select" defaultValue="прав" {...register("upr")} onChange={onchanupr} onClick={onchanupr}>
+            <select id='upr' className="form-select" defaultValue="прав" {...register("upr")} onChange={onchanupr}>
               <option value="прав">прав</option>
               <option value="лев">лев</option>
               <option value="лев">лев/прав</option>
@@ -446,15 +324,10 @@ export default function App() {
 
         </div>
 
-        {/* <div className="d-flex justify-content-center mt-2">
-          <input type="file" onChange={showFile}></input>
-        </div> */}
         <div className="container-fluid w-100 form-floating  form-control-sm">
           <textarea className="form-control form-control-sm h-auto py-0 px-2" value={spisok} readOnly rows={lengthSpisok * 2}></textarea>
         </div>
       </form>
-
-
 
       <div className="row mx-auto w-75 p-0">
 
